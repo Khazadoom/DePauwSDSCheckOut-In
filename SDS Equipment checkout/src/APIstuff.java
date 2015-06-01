@@ -9,9 +9,7 @@ import java.io.InputStream;
 
 public class APIstuff {
 	
-	Drive spreadsheet = new Drive();
-	
-	printFile()
+
 	
 
 	private static void printFile(Drive service, String fileId) {
