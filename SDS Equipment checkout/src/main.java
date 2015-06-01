@@ -1,5 +1,7 @@
 import java.awt.EventQueue;
+import java.io.*;
 import com.google.api.*;
+
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -62,12 +64,16 @@ public class main extends JFrame {
 	String fName = null;
 	String lName = null;
 	String identNum = null;
+	String newline = System.getProperty("line.separator");
 	
 	
 	/**
 	 * Create the frame.
 	 */
-	public main() {				
+	public main() {			
+		
+		
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 350, 177);
 		contentPane = new JPanel();
@@ -144,7 +150,6 @@ public class main extends JFrame {
 			identNum = idNumField.getText();
 		}
 		
-		
 	}
 	
 	public void CheckIn(){
@@ -190,10 +195,43 @@ public class main extends JFrame {
 			fName = firstNameField.getText();
 			lName = lastNameField.getText();
 			identNum = idNumField.getText();
+			barcode += ",";
+			fName += ",";
+			lName += ",";				
+			BufferedWriter writer = null;
+		
+			
+	        try {
+	            //create a temporary file
+	            String timeLog = "TestFile.txt";
+	            String homefolder = System.getProperty("user.home");
+	            File logFile = new File(homefolder,timeLog);
+
+	            // This will output the full path where the file will be written to...
+	            System.out.println(logFile.getCanonicalPath());
+
+	            writer = new BufferedWriter(new FileWriter(logFile,true));
+	            writer.write(barcode+fName+lName+identNum+newline);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            try {
+	                // Close the writer regardless of what happens...
+	                writer.close();
+	            } catch (Exception e) {
+	            }
+	        }
+			 
+			
+			
+			
+		}
+		
+			
+			
 		}
 		
 		
 	}
 
-	}
 	
