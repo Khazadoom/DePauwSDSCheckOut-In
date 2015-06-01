@@ -18,6 +18,24 @@ import java.awt.event.MouseEvent;
 
 import java.awt.Dimension;
 
+/**
+ * 
+ * @author brandonwright831
+ * THIS NEEDS TO BE PROPERLY COMMENTED, OH MY GOSH
+ * SERIOUSLY. DO THIS SOMETIME SOON BEFORE IT GETS OUT OF HAND
+ * 
+ * 
+ * 
+ * THIS PROJECT IS FOR DEPAUW UNIVERSITY AND USES GOOGLE DRIVE API CODE TO FUNCTION PROPERLY
+ * LEGAL STUFF IS THEIR DOMAIN. I JUST WROTE IT.
+ * 
+ *
+ */
+
+
+
+
+
 public class main extends JFrame {
 
 	private JPanel contentPane;
