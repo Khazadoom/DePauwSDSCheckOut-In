@@ -19,8 +19,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.auth.oauth.*;
 import com.google.api.client.auth.oauth2.*;
 import com.google.api.client.googleapis.auth.oauth2.*;
-
-
+import com.google.api.client.extensions.servlet.auth.oauth2.*;
+import com.google.api.client.extensions.appengine.auth.oauth2.*;
 
 
 
