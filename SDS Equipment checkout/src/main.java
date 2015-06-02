@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-
+import com.google.api.services.drive.Drive;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
@@ -148,6 +148,11 @@ public class main extends JFrame {
 			fName = firstNameField.getText();
 			lName = lastNameField.getText();
 			identNum = idNumField.getText();
+			
+			
+			
+			
+			
 		}
 		
 	}
@@ -199,19 +204,21 @@ public class main extends JFrame {
 			fName += ",";
 			lName += ",";				
 			BufferedWriter writer = null;
-		
+			APIstuff test = new APIstuff();			
 			
 	        try {
 	            //create a temporary file
 	            String timeLog = "TestFile.txt";
 	            String homefolder = System.getProperty("user.home");
 	            File logFile = new File(homefolder,timeLog);
-
+	            String testLog = test.downloadFromDrive(logFile);
+	            
 	            // This will output the full path where the file will be written to...
 	            System.out.println(logFile.getCanonicalPath());
 
 	            writer = new BufferedWriter(new FileWriter(logFile,true));
 	            writer.write(barcode+fName+lName+identNum+newline);
+	            writer.write(testLog);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        } finally {
