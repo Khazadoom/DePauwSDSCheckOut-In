@@ -1,6 +1,8 @@
+
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.services.drive.Drive;
+
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 
@@ -9,8 +11,21 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.auth.oauth.*;
+import com.google.api.client.auth.oauth2.*;
+import com.google.api.client.googleapis.auth.oauth2.*;
+
+
+
+
 
 import java.io.*;
+
 
 import com.google.api.services.drive.model.File;
 
@@ -19,7 +34,49 @@ import java.io.IOException;
 import java.io.InputStream;
 
 
+
 public class APIstuff {
+	
+	
+	
+	public static Credential getCredentials(String authorizationCode, String state)
+{
+		    String emailAddress = "";
+		    try {
+		      Credential credentials = exchangeCode(authorizationCode);
+		      Userinfoplus userInfo = credentials.;
+		      String userId = userInfo.getId();
+		      emailAddress = userInfo.getEmail();
+		      if (credentials.getRefreshToken() != null) {
+		        storeCredentials(userId, credentials);
+		        return credentials;
+		      } else {
+		        credentials = getStoredCredentials(userId);
+		        if (credentials != null && credentials.getRefreshToken() != null) {
+		            return credentials;
+		        }
+		      }
+		    } catch (CodeExchangeException e) {
+		      e.printStackTrace();
+		      // Drive apps should try to retrieve the user and credentials for the
+		      // current session.
+		      // If none is available, redirect the user to the authorization URL.
+		      e.setAuthorizationUrl(getAuthorizationUrl(emailAddress, state));
+		      throw e;
+		    } catch (NoUserIdException e) {
+		      e.printStackTrace();
+		    }
+		    // No refresh token has been retrieved.
+		    String authorizationUrl = getAuthorizationUrl(emailAddress, state);
+		    throw new NoRefreshTokenException(authorizationUrl);
+		  }
+	
+	
+	
+	
+	
+	
+	
 	
 
 	static Drive buildService(GoogleCredential credentials) {
