@@ -5,7 +5,6 @@ import com.google.api.services.drive.Drive;
 
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -19,32 +18,121 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.auth.oauth.*;
 import com.google.api.client.auth.oauth2.*;
 import com.google.api.client.googleapis.auth.oauth2.*;
-import com.google.api.client.extensions.servlet.auth.oauth2.*;
-import com.google.api.client.extensions.appengine.auth.oauth2.*;
+import com.google.api.services.oauth2.Oauth2;
+//import com.google.api.client.extensions.servlet.auth.oauth2.*;
+////import com.google.api.client.extensions.appengine.auth.oauth2.*;
+import com.google.api.services.oauth2.model.*;
 
-
-
+import java.util.*;
 import java.io.*;
-
 
 import com.google.api.services.drive.model.File;
 
 import java.lang.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+
+import com.google.api.client.auth.openidconnect.*;
+import com.google.api.client.googleapis.services.*;
+
 
 
 
 public class APIstuff {
 	
+	 private static final String CLIENTSECRET_LOCATION = "/client_secret.json";
+	  private static final String APPLICATION_NAME = "Your app name";
+	  private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+	  private static final List<String> SCOPES = Arrays.asList(
+	      "https://www.googleapis.com/auth/drive.file",
+	      "email",
+	      "profile");
+
+	  private static GoogleAuthorizationCodeFlow flow = null;
+	  private static final JacksonFactory JSON_FACTORY =
+	      JacksonFactory.getDefaultInstance();
+	  private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 	
+	  static GoogleAuthorizationCodeFlow getFlow() throws IOException {
+		    if (flow == null) {
+		      InputStream in =
+		          APIstuff.class.getResourceAsStream(CLIENTSECRET_LOCATION);
+		      GoogleClientSecrets clientSecret =
+		          GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+		      flow = new GoogleAuthorizationCodeFlow.Builder(
+		          HTTP_TRANSPORT, JSON_FACTORY, clientSecret, SCOPES)
+		          .setAccessType("offline")
+		          .setApprovalPrompt("force")
+		          .build();
+		    }
+		    return flow;
+		  }
+	  
+	  
+	  static Credential exchangeCode(String authorizationCode)
+		       throws IOException {
+
+		      GoogleAuthorizationCodeFlow flow = getFlow();
+		      GoogleTokenResponse response = flow
+		          .newTokenRequest(authorizationCode)
+		          .setRedirectUri(REDIRECT_URI)
+		          .execute();
+		      return flow.createAndStoreCredential(response, null);
+
+		  }
+	  
+	  
+	static void storeCredentials(String userId, Credential credentials) throws IOException{
+	
+		BufferedWriter writer = null;
+		String title = "UserInfo.txt";
+        String homefolder = System.getProperty("user.home");
+        java.io.File userInfoFile = new java.io.File(homefolder,title);
+        writer = new BufferedWriter(new FileWriter(userInfoFile,false));
+        writer.write(userId + "," + credentials.getAccessToken() + "," + credentials.getRefreshToken());
+		writer.close();
+	}
+	
+	static Credential getStoredCredentials(String userId){
+	
+		
+		
+		return null;
+	}
+	
+	
+	static Userinfoplus getUserInfo(Credential credentials)
+		    throws IOException {
+		    Oauth2 userInfoService = new Oauth2.Builder(
+		        HTTP_TRANSPORT, JSON_FACTORY, credentials)
+		        .setApplicationName(APPLICATION_NAME)
+		        .build();
+		    Userinfoplus userInfo = null;
+		    
+		      userInfo = userInfoService.userinfo().get().execute();
+		    
+		      return userInfo; 
+		  }
+	
+	public static String getAuthorizationUrl(String emailAddress, String state)
+		      throws IOException {
+		    GoogleAuthorizationCodeRequestUrl urlBuilder = getFlow()
+		        .newAuthorizationUrl()
+		        .setRedirectUri(REDIRECT_URI)
+		        .setState(state);
+		    urlBuilder.set("user_id", emailAddress);
+		    return urlBuilder.build();
+		  }
 	
 	public static Credential getCredentials(String authorizationCode, String state)
 {
 		    String emailAddress = "";
-		    try {
 		      Credential credentials = exchangeCode(authorizationCode);
-		      Userinfoplus userInfo = credentials.;
+		      Userinfoplus userInfo = getUserInfo(credentials);
 		      String userId = userInfo.getId();
 		      emailAddress = userInfo.getEmail();
 		      if (credentials.getRefreshToken() != null) {
@@ -56,23 +144,13 @@ public class APIstuff {
 		            return credentials;
 		        }
 		      }
-		    } catch (CodeExchangeException e) {
-		      e.printStackTrace();
-		      // Drive apps should try to retrieve the user and credentials for the
-		      // current session.
-		      // If none is available, redirect the user to the authorization URL.
-		      e.setAuthorizationUrl(getAuthorizationUrl(emailAddress, state));
-		      throw e;
-		    } catch (NoUserIdException e) {
-		      e.printStackTrace();
-		    }
+		    
 		    // No refresh token has been retrieved.
 		    String authorizationUrl = getAuthorizationUrl(emailAddress, state);
-		    throw new NoRefreshTokenException(authorizationUrl);
-		  }
+
 	
-	
-	
+}
+
 	
 	
 	
